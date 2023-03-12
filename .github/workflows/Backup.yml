@@ -1,0 +1,45 @@
+name: Backup Airtable
+
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+  - cron: '32 0 * * *'
+
+jobs:
+  Backup:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repo
+      uses: actions/checkout@v3
+      with:
+        token: '${{ secrets.WORKFLOW }}'
+        lfs: 'true'
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - uses: actions/cache@v2
+      name: Configure pip caching
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install airtable-export
+      run: |
+        pip install airtable-export
+    - name: Backup Airtable to Backup/
+      run: |-
+        airtable-export Backup ${{ secrets.AIRTABLE_BASE_ID }} ${{ secrets.AIRTABLE_TABLES }} --key=${{ secrets.AIRTABLE_KEY }} --http-read-timeout 60 -v
+    - name: Commit and push if it changed
+      run: |-
+        git lfs install
+        git lfs track "Backup/**"
+        git add .gitattributes
+        git config user.name "Automated"
+        git config user.email "actions@users.noreply.github.com"
+        git add -A
+        timestamp=$(date -u)
+        git commit -m "Latest data: ${timestamp}" || exit 0
+        git push
