@@ -30,7 +30,7 @@ jobs:
         pip install airtable-export
     - name: Backup Airtable to Backup/
       run: |-
-        airtable-export Backup ${{ secrets.AIRTABLE_BASE_ID }} ${{ secrets.AIRTABLE_TABLES }} --key=${{ secrets.AIRTABLE_KEY }} --http-read-timeout 60 -v
+        airtable-export Backup ${{ secrets.AIRTABLE_BASE_ID }} ${{ secrets.AIRTABLE_TABLES }} --key=${{ secrets.AIRTABLE_KEY }} --http-read-timeout 60 --ndjson --yaml --json -v
     - name: Commit and push if it changed
       run: |-
         git lfs install
