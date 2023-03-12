@@ -3,7 +3,7 @@ name: Backup Airtable
 on:
   workflow_dispatch:
   schedule:
-  - cron: '32 0 * * *'
+  - cron: '0 0 15 * *'
 
 jobs:
   Backup:
